@@ -3,9 +3,12 @@ package uz.softex.qrcodegenerator.company.service
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
+import uz.softex.qrcodegenerator.company.dto.CompanyFilter
 import uz.softex.qrcodegenerator.company.entity.Company
 import uz.softex.qrcodegenerator.company.exeption.CompanyNotFound
+import uz.softex.qrcodegenerator.company.projection.CompanyProjection
 import uz.softex.qrcodegenerator.payload.ApiResponseGeneric
 import uz.softex.qrcodegenerator.company.repository.CompanyRepository
 import uz.softex.qrcodegenerator.payload.ApiResponse
@@ -35,9 +38,32 @@ class CompanyService(private val repository: CompanyRepository) {
     }
 
     fun delete(id: Int): ApiResponse {
-        if(!repository.existsById(id))
+        if (!repository.existsById(id))
             throw CompanyNotFound()
         repository.deleteById(id)
         return ApiResponse()
+    }
+
+    fun filter(filter: CompanyFilter, page: Int, size: Int): ApiResponseGeneric<Page<CompanyProjection>> {
+        var pageable = PageRequest.of(page, size)
+        val sort = filter.sort
+        if (sort != null) {
+            for (key in sort.keys) {
+                if (sort[key] == "desc")
+                    pageable = PageRequest.of(page, size, pageable.sort.and(Sort.by(key).descending()))
+                else if (sort[key] == "asc")
+                    pageable = PageRequest.of(page, size, pageable.sort.and(Sort.by(key)))
+            }
+        }
+        val filter1 = repository.filter(
+            filter.name ?: "",
+            filter.director ?: "",
+            filter.phoneNumber ?: "",
+            filter.address ?: "",
+            pageable
+        )
+        println(filter1)
+        println(filter.name?:"name")
+        return ApiResponseGeneric(filter1)
     }
 }

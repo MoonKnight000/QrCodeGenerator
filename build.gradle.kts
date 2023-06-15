@@ -38,9 +38,7 @@ dependencies {
     implementation("io.github.g0dkar:qrcode-kotlin-jvm:3.3.0")
     implementation ("org.apache.poi:poi:5.2.0")
     implementation ("org.apache.poi:poi-ooxml:5.2.0")
-
-
-
+    implementation ("org.springframework.boot:spring-boot-starter-security")
 }
 
 tasks.withType<KotlinCompile> {

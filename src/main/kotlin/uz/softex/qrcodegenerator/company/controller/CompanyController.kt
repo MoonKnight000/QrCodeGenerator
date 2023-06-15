@@ -1,5 +1,6 @@
 package uz.softex.qrcodegenerator.company.controller
 
+import org.springframework.data.domain.Page
 import org.springframework.http.HttpEntity
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -11,8 +12,11 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import uz.softex.qrcodegenerator.company.dto.CompanyFilter
 import uz.softex.qrcodegenerator.company.entity.Company
+import uz.softex.qrcodegenerator.company.projection.CompanyProjection
 import uz.softex.qrcodegenerator.company.service.CompanyService
+import uz.softex.qrcodegenerator.payload.ApiResponseGeneric
 
 @RestController
 @RequestMapping("/company")
@@ -45,5 +49,10 @@ class CompanyController(val service: CompanyService) {
     @DeleteMapping("/{id}")
     fun delete(@PathVariable id: Int): HttpEntity<*> {
         return ResponseEntity.ok(service.delete(id))
+    }
+
+    @PostMapping("/filter")
+    fun filter(@RequestBody filter: CompanyFilter,@RequestParam page:Int, @RequestParam size:Int): ResponseEntity<ApiResponseGeneric<Page<CompanyProjection>>> {
+        return ResponseEntity.ok(service.filter(filter,page, size))
     }
 }
